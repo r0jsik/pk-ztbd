@@ -1,6 +1,7 @@
 from pk.repo.postgres import PostgresRepository
 from pk.repo.elasticearch import ElasticsearchRepository
 from pk.repo.mongo import MongoRepository
+from pk.gui.window import Window
 
 if __name__ == '__main__':
 	repository = PostgresRepository()
@@ -15,3 +16,6 @@ if __name__ == '__main__':
 	
 	for result in results:
 		print(result)
+	
+	window = Window()
+	window.show()
