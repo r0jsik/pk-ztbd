@@ -42,6 +42,18 @@ services:
       - postgres-data:/var/lib/postgresql/data
     restart: always
 
+  pgadmin:
+    container_name: pgadmin
+    build:
+      context: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: test@test.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5433:80"
+    restart:
+      always
+
 volumes:
   mongodb-data:
   elasticsearch-data:

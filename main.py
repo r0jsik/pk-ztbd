@@ -17,4 +17,4 @@ if __name__ == '__main__':
 	
 	results = repository.select_all()
 	for song in results:
-		print(song.title)
+		print(song.artist)
