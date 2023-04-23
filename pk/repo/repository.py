@@ -1,4 +1,7 @@
 class Repository:
+	def create(self):
+		raise NotImplementedError()
+
 	def insert(self, item):
 		raise NotImplementedError()
 	
