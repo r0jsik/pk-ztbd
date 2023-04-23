@@ -1,17 +1,36 @@
 from pk.source.source import Source
 from pk.objects.song import Song
-import pandas as pd
+from pk.objects.genre import Genre
+from pk.objects.author import Author
+import csv
 
 class FileSource:
 	def __init__(self):
-		self.df = pd.read_csv("data/song_lyrics.csv")
+		pass
 
-	def get(self):
-		songs = []
-		for index, line in self.df.iterrows():
-			song = Song(line["id"], line["title"], line["tag"], line["artist"], line["year"],
-	       				line["views"], line["features"], line["lyrics"], line["language_cld3"], line["language_ft"], line["language"])
+	def get_next_song(self):
+		author_id = 1
+		genre_id = 1
 
-			songs.append(song)
+		authors = {}
+		genres = {}
+		with open("data/song_lyrics.csv", encoding="utf-8") as csv_file:
+			reader = csv.reader(csv_file)
+			for index, line in enumerate(reader):
+				if index == 0:
+					continue
 
-		return songs
+				elif index > 1000:
+					break
+
+				title, tag, artist, year, views, features, lyrics, id, language_cld3, language_ft, language = line
+
+				if tag not in genres:
+					genres[tag] = Genre(genre_id, tag)
+					genre_id += 1
+
+				if artist not in authors:
+					authors[artist] = Author(author_id, artist)
+					author_id += 1
+
+				yield Song(id, title, genres[tag], authors[artist], year, views, features, lyrics, language_cld3, language_ft, language)
