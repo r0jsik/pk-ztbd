@@ -1,3 +1,3 @@
 class Source:
-	def get(self):
+	def get_next_song(self):
 		raise NotImplementedError()

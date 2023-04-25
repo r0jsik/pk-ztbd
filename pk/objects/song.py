@@ -1,9 +1,9 @@
 class Song:
-    def __init__(self, id, title, tag, artist, year, views,
+    def __init__(self, id, title, genre, artist, year, views,
                  features, lyrics, lang_cld3, lang_ft, language):
         self.id = id
         self.title = title
-        self.tag = tag
+        self.genre = genre
         self.artist = artist
         self.year = year
         self.views = views
