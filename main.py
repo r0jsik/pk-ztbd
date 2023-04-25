@@ -1,3 +1,4 @@
+from pk.gui.window import Window
 from pk.repo.postgres import PostgresRepository
 #from pk.repo.elasticearch import ElasticsearchRepository
 #from pk.repo.mongo import MongoRepository
@@ -18,3 +19,6 @@ if __name__ == '__main__':
 	results = repository.select_all()
 	for song in results:
 		print(song.artist)
+	
+	window = Window()
+	window.show()
