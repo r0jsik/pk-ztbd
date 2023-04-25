@@ -6,14 +6,13 @@ from pk.source.file import FileSource
 
 if __name__ == '__main__':
 	source = FileSource()
-	songs = source.get()
 	
 	repository = PostgresRepository()
 	#repository = ElasticsearchRepository()
 	#repository = MongoRepository()
 	repository.create()
 	
-	for song in songs:
+	for song in source.get_next_song():
 		repository.insert(song)
 	
 	results = repository.select_all()
