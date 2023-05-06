@@ -12,7 +12,7 @@ class CreateForm:
 		self.genre_entry = tk.Entry(self.panel)
 		self.year_entry = tk.Entry(self.panel)
 		self.language_entry = tk.Entry(self.panel)
-		self.keywords_entry = tk.Entry(self.panel)
+		self.lyrics_entry = tk.Entry(self.panel)
 	
 	def show(self):
 		tk.Label(self.panel, text="Tytuł").grid(row=0, column=0, sticky=tk.W)
@@ -30,8 +30,8 @@ class CreateForm:
 		tk.Label(self.panel, text="Język").grid(row=4, column=0, sticky=tk.W)
 		self.language_entry.grid(row=4, column=1)
 		
-		tk.Label(self.panel, text="Słowa kluczowe").grid(row=5, column=0, sticky=tk.W)
-		self.keywords_entry.grid(row=5, column=1)
+		tk.Label(self.panel, text="Tekst").grid(row=5, column=0, sticky=tk.W)
+		self.lyrics_entry.grid(row=5, column=1)
 		
 		create_button = tk.Button(self.panel, text="Utwórz", command=self.create_record)
 		create_button.grid(row=6, column=1, sticky=tk.E)
@@ -45,7 +45,7 @@ class CreateForm:
 		genre = self.genre_entry.get()
 		year = self.year_entry.get()
 		language = self.language_entry.get()
-		keywords = self.keywords_entry.get()
+		keywords = self.lyrics_entry.get()
 		
 		self.insert_record_callback(title, artist, genre, year, language, keywords)
 

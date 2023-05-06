@@ -51,26 +51,26 @@ class Window:
         graph = Graph(summary_tab)
         graph.show(x, y)
     
-    def insert_record(self, title, artist, genre, year, language, keywords):
-        print(f"Saved record: {title}, {artist}, {genre}, {year}, {language}, {keywords}")
+    def insert_record(self, title, artist, genre, year, language, lyrics):
+        duration, _ = self.__controller.insert_record(title, artist, genre, year, language, lyrics)
+        self.show_duration(duration)
     
     def import_records(self):
         filename = tk.filedialog.askopenfilename(filetypes=[("Dokumenty CSV", "*.csv")])
         
         if filename:
-            duration = self.__controller.import_from_file(filename)
+            duration, _ = self.__controller.import_from_file(filename)
             self.show_duration(duration)
     
     def show_duration(self, duration):
-        self.__label.config(text=f"Last operation duration: {duration:.3f}s")
+        self.__label.config(text=f"Czas ostatniej operacji: {duration:.3f}s")
     
     def search_records(self, title, year, keywords, artist, language):
-        return [
-            {"title": "The Catcher in the Rye", "popularity": 1000},
-            {"title": "To Kill a Mockingbird", "popularity": 1000},
-            {"title": "1984", "popularity": 1000},
-            {"title": "One Hundred Years of Solitude", "popularity": 1000}
-        ]
+        duration, records = self.__controller.select_records(title, year, keywords, artist, language)
+        self.show_duration(duration)
+        
+        for record in records:
+            yield {"title": record.title, "popularity": record.views}
     
     def show(self):
         self.__root.mainloop()
