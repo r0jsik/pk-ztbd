@@ -16,10 +16,15 @@ class Tab(ttk.Frame):
 
 
 class Window:
-    def __init__(self):
+    def __init__(self, controller):
+        self.__controller = controller
+        
         self.__root = tk.Tk()
         self.__root.geometry("600x480")
         self.__root.title("Projekt ZTBD")
+        
+        self.__label = tk.Label(self.__root, text="")
+        self.__label.pack()
         
         self.tab_panel = ttk.Notebook(self.__root)
         
@@ -50,8 +55,14 @@ class Window:
         print(f"Saved record: {title}, {artist}, {genre}, {year}, {language}, {keywords}")
     
     def import_records(self):
-        filename = tk.filedialog.askopenfilename(filetypes=[("Dokumenty JSON", "*.json")])
-        print(f"import from {filename}")
+        filename = tk.filedialog.askopenfilename(filetypes=[("Dokumenty CSV", "*.csv")])
+        
+        if filename:
+            duration = self.__controller.import_from_file(filename)
+            self.show_duration(duration)
+    
+    def show_duration(self, duration):
+        self.__label.config(text=f"Last operation duration: {duration:.3f}s")
     
     def search_records(self, title, year, keywords, artist, language):
         return [

@@ -5,8 +5,8 @@ from pk.objects.author import Author
 import csv
 
 class FileSource:
-	def __init__(self):
-		pass
+	def __init__(self, file_path):
+		self.file_path = file_path
 
 	def get_next_song(self):
 		author_id = 1
@@ -14,7 +14,7 @@ class FileSource:
 
 		authors = {}
 		genres = {}
-		with open("data/song_lyrics.csv", encoding="utf-8") as csv_file:
+		with open(self.file_path, encoding="utf-8") as csv_file:
 			reader = csv.reader(csv_file)
 			for index, line in enumerate(reader):
 				if index == 0:
