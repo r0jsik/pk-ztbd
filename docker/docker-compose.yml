@@ -21,6 +21,7 @@ services:
       context: elasticsearch
     environment:
       discovery.type: single-node
+      ELASTICSEARCH_TLS_ENABLED: false
       ELASTIC_PASSWORD: es
     ports:
       - "9200:9200"

@@ -1,37 +1,79 @@
 from elasticsearch import Elasticsearch
-from ssl import create_default_context, CERT_NONE
+from elasticsearch.helpers import bulk
 from pk.repo.repository import Repository
 
+
 class ElasticsearchRepository(Repository):
-	def __init__(self):
-		context = create_default_context()
-		context.check_hostname = False
-		context.verify_mode = CERT_NONE
-		
-		self.__connection = Elasticsearch(
-			hosts="https://localhost:9200",
-			http_auth=("elastic", "es"),
-			ssl_context=context,
-			verify_certs=False,
-		)
-	
-	def insert(self, item):
-		self.__connection.index(index="index", body=item)
-	
-	def update(self, item):
-		pass
-	
-	def remove(self, item):
-		pass
-	
-	def select_all(self):
-		search_query = {
-			"query": {
-				"match_all": {}
-			}
-		}
-		
-		search_results = self.__connection.search(index="index", body=search_query)
-		
-		for result in search_results["hits"]["hits"]:
-			yield result
+    def __init__(self):
+        self.__connection = Elasticsearch(
+            hosts="http://localhost:9200",
+            http_auth=("elastic", "es"),
+            verify_certs=False
+        )
+    
+    def create(self):
+        mapping = {
+            "properties": {
+                "title": {"type": "text"},
+                "genre": {
+                    "properties": {
+                        "_id": {"type": "keyword"},
+                        "name": {"type": "text"}
+                    }
+                },
+                "artist": {
+                    "properties": {
+                        "_id": {"type": "keyword"},
+                        "name": {"type": "text"}
+                    }
+                },
+                "year": {"type": "integer"},
+                "views": {"type": "integer"},
+                "lyrics": {"type": "text"},
+                "lang_cld3": {"type": "keyword"},
+                "lang_ft": {"type": "keyword"},
+                "language": {"type": "keyword"}
+            }
+        }
+        
+        self.__connection.indices.delete(index="index", ignore=[404])
+        self.__connection.indices.create(index="index")
+        self.__connection.indices.put_mapping(index="index", body=mapping)
+
+    def insert_all(self, items):
+        actions = [
+            {
+                "_index": "index",
+                "_source": item
+            }
+            for item in items
+        ]
+        
+        bulk(self.__connection, actions)
+
+    def insert(self, item):
+        self.__connection.index(index="index", body=item)
+    
+    def update(self, item_id, item):
+        self.__connection.update(index="index", id=item_id, body={"doc": item})
+    
+    def remove(self, item_id):
+        self.__connection.delete(index="index", id=item_id)
+    
+    def select_all(self, **criteria):
+        query = {
+            "query": {
+                "bool": {
+                    "must": []
+                }
+            }
+        }
+        
+        for parameter, value in criteria.items():
+            if value:
+                query["query"]["bool"]["must"].append({"match": {parameter: value}})
+        
+        search_results = self.__connection.search(index="index", body=query)
+        
+        for result in search_results["hits"]["hits"]:
+            yield result["_source"]
