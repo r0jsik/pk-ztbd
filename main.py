@@ -4,6 +4,7 @@ from pk.gui.window import Window
 from pk.repo.elasticearch import ElasticsearchRepository
 from pk.repo.mongo import MongoRepository
 from pk.repo.postgres import PostgresRepository
+from pk.scraper.lyrics_provider import scrap_lyrics
 from pk.source.file import FileSource
 
 
@@ -19,8 +20,8 @@ def timed(func):
 
 class Controller:
 	def __init__(self):
-		# self.repository = PostgresRepository()
-		self.repository = ElasticsearchRepository()
+		self.repository = PostgresRepository()
+		# self.repository = ElasticsearchRepository()
 		# self.repository = MongoRepository()
 		
 	def initialize(self):
@@ -56,19 +57,23 @@ class Controller:
 	@timed
 	def import_from_file(self, file_name):
 		file_source = FileSource(file_name)
-		batch = []
+		items = []
 		
-		for song in file_source.get_next_song():
-			batch.append(song)
+		for item in file_source.get_next_song():
+			items.append(item)
 			
-			if len(batch) == 1000:
-				self.repository.insert_all(batch)
-				batch.clear()
+			if len(items) == 10000:
+				self.repository.insert_all(items)
+				items = []
+				print(item["id"])
 		
-		self.repository.insert_all(batch)
+		self.repository.insert_all(items)
 
 
 if __name__ == '__main__':
+	lyrics = scrap_lyrics("Alphaville", "Forever young")
+	print(lyrics)
+	
 	controller = Controller()
 	controller.initialize()
 	

@@ -8,7 +8,8 @@ class ElasticsearchRepository(Repository):
         self.__connection = Elasticsearch(
             hosts="http://localhost:9200",
             http_auth=("elastic", "es"),
-            verify_certs=False
+            verify_certs=False,
+            request_timeout=60000
         )
     
     def create(self):
