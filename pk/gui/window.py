@@ -52,7 +52,7 @@ class Window:
         graph.show(x, y)
     
     def insert_record(self, title, artist, genre, year, language, lyrics):
-        duration, _ = self.__controller.insert_record(title, artist, genre, year, language, lyrics)
+        duration, _ = self.__controller.insert_item(title, artist, genre, year, language, lyrics)
         self.show_duration(duration)
     
     def import_records(self):
@@ -66,11 +66,11 @@ class Window:
         self.__label.config(text=f"Czas ostatniej operacji: {duration:.3f}s")
     
     def search_records(self, title, year, keywords, artist, language):
-        duration, records = self.__controller.select_records(title, year, keywords, artist, language)
+        duration, items = self.__controller.select_items(title, year, keywords, artist, language)
         self.show_duration(duration)
         
-        for record in records:
-            yield {"title": record.title, "popularity": record.views}
+        for item in items:
+            yield {"title": item["title"], "popularity": item["views"]}
     
     def show(self):
         self.__root.mainloop()

@@ -1,92 +1,122 @@
 import psycopg2
 from pk.repo.repository import Repository
-from pk.objects.song import Song
-from pk.objects.genre import Genre
-from pk.objects.author import Author
+
 
 class PostgresRepository(Repository):
-	def __init__(self):
-		self.__connection = psycopg2.connect(
-			host="localhost",
-			database="psql",
-			user="psql",
-			password="psql"
-		)
+    def __init__(self):
+        self.__connection = psycopg2.connect(
+            host="localhost",
+            database="psql",
+            user="psql",
+            password="psql"
+        )
+    
+    def create(self):
+        with self.__connection.cursor() as cursor:
+            cursor.execute("DROP TABLE IF EXISTS songs;")
+            cursor.execute("DROP TABLE IF EXISTS artists;")
+            cursor.execute("DROP TABLE IF EXISTS genres;")
+            
+            cursor.execute("""
+                CREATE TABLE songs (
+                    "id" SERIAL PRIMARY KEY,
+                    "title" varchar,
+                    "genre_id" integer,
+                    "artist_id" integer,
+                    "year" integer,
+                    "views" integer,
+                    "lyrics" varchar,
+                    "lang_cld3" varchar,
+                    "lang_ft" varchar,
+                    "language" varchar
+                    );
+            """)
+            
+            cursor.execute("""
+                CREATE TABLE artists (
+                    "id" SERIAL PRIMARY KEY,
+                    "name" varchar
+                );
+            """)
+            
+            cursor.execute("""
+                CREATE TABLE genres (
+                    "id" SERIAL PRIMARY KEY,
+                    "name" varchar
+                );
+            """)
 
-	def create(self):
-		with self.__connection.cursor() as cursor:
-			query = "DROP TABLE IF EXISTS song_lyrics"
-			cursor.execute(query)
+    def insert_all(self, items):
+        pass
 
-			query = "DROP TABLE IF EXISTS song_authors"
-			cursor.execute(query)
-
-			query = "DROP TABLE IF EXISTS song_genres"
-			cursor.execute(query)
-
-			query = """CREATE TABLE "song_lyrics" (
-			"id" integer PRIMARY KEY,
-			"title" varchar,
-			"genre" integer,
-			"artist" integer,
-			"year" integer,
-			"views" integer,
-			"features" varchar,
-			"lyrics" varchar,
-			"lang_cld3" varchar,
-			"lang_ft" varchar,
-			"language" varchar
-			);"""
-			cursor.execute(query)
-
-			query = """CREATE TABLE "song_authors" (
-			"id" integer PRIMARY KEY,
-			"name" varchar
-			);"""
-			cursor.execute(query)
-
-			query = """CREATE TABLE "song_genres" (
-			"id" integer PRIMARY KEY,
-			"name" varchar
-			);"""
-			cursor.execute(query)		
-	
-	def insert(self, item):
-		with self.__connection.cursor() as cursor:
-			query = ("INSERT INTO song_lyrics "
-	     			"(id, title, genre, artist, year, views, features, lyrics, lang_cld3, lang_ft, language) "
-					"VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);")
-			params = (item.id, item.title, item.genre.id, item.artist.id, item.year, item.views,
-	     			  item.features, item.lyrics, item.lang_cld3, item.lang_ft, item.language)
-			cursor.execute(query, params)
-
-			query = ("INSERT INTO song_authors "
-	    			 "(id, name)" 
-					 "VALUES (%s, %s) "
-					 "ON CONFLICT DO NOTHING;")
-			params = (item.artist.id, item.artist.name)
-			cursor.execute(query, params)
-
-			query = ("INSERT INTO song_genres "
-	    			 "(id, name)" 
-					 "VALUES (%s, %s) "
-					 "ON CONFLICT DO NOTHING;")
-			params = (item.genre.id, item.genre.name)
-			cursor.execute(query, params)
-	
-	def update(self, item):
-		pass
-	
-	def remove(self, item):
-		pass
-	
-	def select_all(self):
-		with self.__connection.cursor() as cursor:
-			cursor.execute("SELECT song_lyrics.id, title, song_genres.id, song_genres.name, song_authors.id, song_authors.name, year, views, features, lyrics, lang_cld3, lang_ft, language "
-		   				   "FROM song_lyrics, song_authors, song_genres "
-						   "WHERE song_lyrics.genre = song_genres.id AND song_lyrics.artist = song_authors.id;")
-			rows = cursor.fetchall()
-			
-			for row in rows:
-				id, title, genre_id, genre_name, artist_id, artist_name, year, views, features, lyrics, lang_cld3, lang_ft, language = row
-				yield Song(id, title, Genre(genre_id, genre_name), Author(artist_id, artist_name), year, views, features, lyrics, lang_cld3, lang_ft, language)
+    def insert(self, item):
+        with self.__connection.cursor() as cursor:
+            query = "INSERT INTO artists (id, name) VALUES (%s, %s) ON CONFLICT DO NOTHING;"
+            params = (item["artist"]["id"], item["artist"]["name"])
+            cursor.execute(query, params)
+    
+            query = "INSERT INTO genres (id, name) VALUES (%s, %s) ON CONFLICT DO NOTHING;"
+            params = (item["genre"]["id"], item["genre"]["name"])
+            cursor.execute(query, params)
+            
+            query = "INSERT INTO songs" \
+                    " (id, title, genre_id, artist_id, year, views, lyrics, lang_cld3, lang_ft, language)" \
+                    " VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
+            params = (item["id"], item["title"], item["genre"]["id"], item["artist"]["id"], item["year"], item["views"],
+                      item["lyrics"], item["lang_cld3"], item["lang_ft"], item["language"])
+            cursor.execute(query, params)
+    
+    def update(self, item_id, item):
+        with self.__connection.cursor() as cursor:
+            query = """
+                        UPDATE songs
+                        SET title = %s, genre_id = %s, artist_id = %s, year = %s, views = %s, lyrics = %s,
+                            lang_cld3 = %s, lang_ft = %s, language = %s
+                        WHERE id = %s;
+                    """
+            params = (item["title"], item["genre"]["id"], item["artist"]["id"], item["year"], item["views"],
+                      item["lyrics"], item["lang_cld3"], item["lang_ft"], item["language"], item_id)
+            cursor.execute(query, params)
+        
+        self.__connection.commit()
+    
+    def remove(self, item_id):
+        with self.__connection.cursor() as cursor:
+            query = "DELETE FROM songs WHERE id = %s;"
+            params = (item_id,)
+            cursor.execute(query, params)
+        
+        self.__connection.commit()
+    
+    def select_all(self, **criteria):
+        with self.__connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT
+                    s.id, title, g.id, g.name, a.id, a.name, year, views, lyrics, lang_cld3, lang_ft, language
+                FROM
+                    songs s JOIN artists a ON s.artist_id = a.id JOIN genres g ON s.genre_id = g.id;
+            """)
+            
+            rows = cursor.fetchall()
+            
+            for row in rows:
+                song_id, title, genre_id, genre, artist_id, artist, year, views, lyrics, lang_cld3, lang_ft, lang = row
+                
+                yield {
+                    "id": song_id,
+                    "title": title,
+                    "genre": {
+                        "id": genre_id,
+                        "name": genre
+                    },
+                    "artist": {
+                        "id": artist_id,
+                        "name": artist
+                    },
+                    "year": year,
+                    "views": views,
+                    "lyrics": lyrics,
+                    "lang_cld3": lang_cld3,
+                    "lang_ft": lang_ft,
+                    "language": lang
+                }

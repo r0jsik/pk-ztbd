@@ -12,7 +12,7 @@ services:
     ports:
       - "27017:27017"
     volumes:
-      - mongodb-data:/data/db
+      - ~/ztbd/mongodb-data:/data/db
     restart: always
 
   elasticsearch:
@@ -21,11 +21,12 @@ services:
       context: elasticsearch
     environment:
       discovery.type: single-node
+      ELASTICSEARCH_TLS_ENABLED: false
       ELASTIC_PASSWORD: es
     ports:
       - "9200:9200"
     volumes:
-      - elasticsearch-data:/usr/share/elasticsearch/data
+      - ~/ztbd/elasticsearch-data:/usr/share/elasticsearch/data
     restart: always
 
   postgres:
@@ -39,7 +40,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - ~/ztbd/postgres-data:/var/lib/postgresql/data
     restart: always
 
   pgadmin:
@@ -53,8 +54,3 @@ services:
       - "5433:80"
     restart:
       always
-
-volumes:
-  mongodb-data:
-  elasticsearch-data:
-  postgres-data:
