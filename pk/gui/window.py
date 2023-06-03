@@ -48,8 +48,8 @@ class Window:
         x = np.arange(0, 4 * np.pi, 0.1)
         y = np.sin(x)
         
-        graph = Graph(summary_tab)
-        graph.show(x, y)
+        self.graph = Graph(summary_tab)
+        #self.graph.show(x, y)
     
     def insert_record(self, title, artist, genre, year, language, lyrics):
         duration, _ = self.__controller.insert_item(title, artist, genre, year, language, lyrics)
@@ -68,9 +68,15 @@ class Window:
     def search_records(self, title, year, keywords, artist, language):
         duration, items = self.__controller.select_items(title, year, keywords, artist, language)
         self.show_duration(duration)
+
+        popularity = []
         
         for item in items:
+            popularity.append(int(item["views"]))
             yield {"title": item["title"], "popularity": item["views"]}
+
+        self.graph.draw_gauss_dist(popularity)
+        
     
     def show(self):
         self.__root.mainloop()

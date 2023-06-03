@@ -47,7 +47,8 @@ class PostgresRepository(Repository):
             """)
 
     def insert_all(self, items):
-        pass
+        for item in items:
+            self.insert(item)
 
     def insert(self, item):
         with self.__connection.cursor() as cursor:
@@ -89,16 +90,38 @@ class PostgresRepository(Repository):
         self.__connection.commit()
     
     def select_all(self, **criteria):
+        filter_query = []
+        #TODO prevent sql injection here
+        for k, v in criteria.items():
+            if v:
+                if k == "year":
+                    filter_query.append(f"year = {v}")
+                elif k == "title":
+                    filter_query.append(f"title = '{v}'")
+                elif k == "keywords":
+                    filter_query.append(f"lyrics LIKE '%{v}%'")
+                elif k == "artist":
+                    filter_query.append(f"a.name = '{v}'")
+                elif k == "language":
+                    filter_query.append(f"language = '{v}'")
+
+        to_filter = " AND ".join(filter_query)
+
         with self.__connection.cursor() as cursor:
-            cursor.execute("""
+            query = """
                 SELECT
                     s.id, title, g.id, g.name, a.id, a.name, year, views, lyrics, lang_cld3, lang_ft, language
                 FROM
-                    songs s JOIN artists a ON s.artist_id = a.id JOIN genres g ON s.genre_id = g.id;
-            """)
+                    songs s JOIN artists a ON s.artist_id = a.id JOIN genres g ON s.genre_id = g.id
+            """
+
+            if to_filter:
+                query += "WHERE " + to_filter
+            
+            cursor.execute(query)
             
             rows = cursor.fetchall()
-            
+
             for row in rows:
                 song_id, title, genre_id, genre, artist_id, artist, year, views, lyrics, lang_cld3, lang_ft, lang = row
                 
