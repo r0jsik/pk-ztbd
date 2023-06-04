@@ -1,5 +1,4 @@
 import tkinter as tk
-import numpy as np
 from tkinter import filedialog, ttk
 
 from pk.gui.form import CreateForm, SearchForm
@@ -20,6 +19,7 @@ class Window:
         self.__controller = controller
         
         self.__root = tk.Tk()
+        self.__root.resizable(width=False, height=False)
         self.__root.geometry("600x480")
         self.__root.title("Projekt ZTBD")
         
@@ -37,7 +37,8 @@ class Window:
         summary_tab = Tab(self.tab_panel)
         summary_tab.show("Podsumowanie")
         
-        self.tab_panel.pack(expand=1, fill="both")
+        self.tab_panel.pack(expand=True, fill="both")
+        self.tab_panel.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
         
         create_form = CreateForm(creator_tab, self.insert_record, self.import_records)
         create_form.show()
@@ -45,14 +46,10 @@ class Window:
         search_form = SearchForm(search_tab, self.search_records)
         search_form.show()
         
-        x = np.arange(0, 4 * np.pi, 0.1)
-        y = np.sin(x)
-        
         self.graph = Graph(summary_tab)
-        #self.graph.show(x, y)
     
-    def insert_record(self, title, artist, genre, year, language, lyrics):
-        duration, _ = self.__controller.insert_item(title, artist, genre, year, language, lyrics)
+    def insert_record(self, title, artist, genre, year, language, views, lyrics):
+        duration, _ = self.__controller.insert_item(title, artist, genre, year, language, views, lyrics)
         self.show_duration(duration)
     
     def import_records(self):
@@ -76,7 +73,6 @@ class Window:
             yield {"title": item["title"], "popularity": item["views"]}
 
         self.graph.draw_gauss_dist(popularity)
-        
     
     def show(self):
         self.__root.mainloop()

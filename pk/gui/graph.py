@@ -30,26 +30,19 @@ class Graph:
 		widget.pack()
 
 	def draw_gauss_dist(self, data):
-		# Calculate mean and standard deviation
 		mean = np.mean(data)
 		std_dev = np.std(data)
 		median = np.median(data)
-
-		# Generate x values for the Gaussian distribution
 		x = np.linspace(min(data), max(data), 100)
-
-		# Calculate the probability density function (PDF) using the mean and standard deviation
 		pdf = norm.pdf(x, mean, std_dev)
 
-		# Plot the Gaussian distribution
 		self.plot.cla()
-		self.plot.plot(x, pdf, label='Gaussian Distribution')
-		self.plot.hist(data, bins=10, density=True, alpha=0.5, label='Song Popularity')
-		self.plot.set_xlabel('Popularity')
-		self.plot.set_ylabel('Probability Density')
+		self.plot.plot(x, pdf, label='Rozkład Gaussa')
+		self.plot.hist(data, bins=10, density=True, alpha=0.5, label='Popularność')
+		self.plot.set_xlabel('Popularność')
+		self.plot.set_ylabel('Wystąpienia')
 		self.plot.legend()
 
-		# Update label data
 		self.average.config(text="Średnia: {:.2f}".format(mean))
 		self.median.config(text="Mediana: {:.2f}".format(median))
 		self.standard_deviation.config(text="Odchylenie standardowe: {:.2f}".format(std_dev))
