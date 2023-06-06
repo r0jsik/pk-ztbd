@@ -20,7 +20,7 @@ class Window:
         
         self.__root = tk.Tk()
         self.__root.resizable(width=False, height=False)
-        self.__root.geometry("600x480")
+        self.__root.geometry("600x600")
         self.__root.title("Projekt ZTBD")
         
         self.__label = tk.Label(self.__root, text="")
@@ -38,7 +38,6 @@ class Window:
         summary_tab.show("Podsumowanie")
         
         self.tab_panel.pack(expand=True, fill="both")
-        self.tab_panel.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
         
         create_form = CreateForm(creator_tab, self.insert_record, self.import_records)
         create_form.show()
@@ -70,7 +69,7 @@ class Window:
         
         for item in items:
             popularity.append(int(item["views"]))
-            yield {"title": item["title"], "popularity": item["views"]}
+            yield item
 
         self.graph.draw_gauss_dist(popularity)
     

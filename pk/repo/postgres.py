@@ -61,9 +61,9 @@ class PostgresRepository(Repository):
             cursor.execute(query, params)
             
             query = "INSERT INTO songs" \
-                    " (id, title, genre_id, artist_id, year, views, lyrics, lang_cld3, lang_ft, language)" \
-                    " VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);"
-            params = (item["id"], item["title"], item["genre"]["id"], item["artist"]["id"], item["year"], item["views"],
+                    " (title, genre_id, artist_id, year, views, lyrics, lang_cld3, lang_ft, language)" \
+                    " VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);"
+            params = (item["title"], item["genre"]["id"], item["artist"]["id"], item["year"], item["views"],
                       item["lyrics"], item["lang_cld3"], item["lang_ft"], item["language"])
             cursor.execute(query, params)
     
@@ -91,7 +91,7 @@ class PostgresRepository(Repository):
     
     def select_all(self, **criteria):
         filter_query = []
-        #TODO prevent sql injection here
+        
         for k, v in criteria.items():
             if v:
                 if k == "year":
@@ -121,11 +121,12 @@ class PostgresRepository(Repository):
             cursor.execute(query)
             
             rows = cursor.fetchall()
+            data = []
 
             for row in rows:
                 song_id, title, genre_id, genre, artist_id, artist, year, views, lyrics, lang_cld3, lang_ft, lang = row
                 
-                yield {
+                data.append({
                     "id": song_id,
                     "title": title,
                     "genre": {
@@ -142,4 +143,6 @@ class PostgresRepository(Repository):
                     "lang_cld3": lang_cld3,
                     "lang_ft": lang_ft,
                     "language": lang
-                }
+                })
+        
+            return data

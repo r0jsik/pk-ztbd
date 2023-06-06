@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
   mongodb:
@@ -6,14 +6,13 @@ services:
     build:
       context: mongo
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_USERNAME: mongo
       MONGO_INITDB_ROOT_PASSWORD: mongo
       MONGO_INITDB_DATABASE: mongo
     ports:
       - "27017:27017"
     volumes:
-      - ~/ztbd/mongodb-data:/data/db
-    restart: always
+      - mongodb-data:/data/db
 
   elasticsearch:
     container_name: elasticsearch
@@ -26,8 +25,7 @@ services:
     ports:
       - "9200:9200"
     volumes:
-      - ~/ztbd/elasticsearch-data:/usr/share/elasticsearch/data
-    restart: always
+      - elasticsearch-data:/usr/share/elasticsearch/data
 
   postgres:
     container_name: psql
@@ -40,8 +38,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ~/ztbd/postgres-data:/var/lib/postgresql/data
-    restart: always
+      - postgres-data:/var/lib/postgresql/data
 
   pgadmin:
     container_name: pgadmin
@@ -52,5 +49,23 @@ services:
       PGADMIN_DEFAULT_PASSWORD: admin
     ports:
       - "5433:80"
-    restart:
-      always
+
+volumes:
+  mongodb-data:
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "/mnt/d/Projekty/pk-ztbd-data/mongodb"
+  elasticsearch-data:
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "/mnt/d/Projekty/pk-ztbd-data/elasticsearch"
+  postgres-data:
+    driver: local
+    driver_opts:
+      type: "none"
+      o: "bind"
+      device: "/mnt/d/Projekty/pk-ztbd-data/postgres"

@@ -76,5 +76,4 @@ class ElasticsearchRepository(Repository):
         
         search_results = self.__connection.search(index="index", body=query)
         
-        for result in search_results["hits"]["hits"]:
-            yield result["_source"]
+        return list(search_results["hits"]["hits"]["_source"])

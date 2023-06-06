@@ -20,11 +20,12 @@ def timed(func):
 class Controller:
 	def __init__(self):
 		# self.repository = PostgresRepository()
-		self.repository = ElasticsearchRepository()
-		# self.repository = MongoRepository()
+		# self.repository = ElasticsearchRepository()
+		self.repository = MongoRepository()
 		
 	def initialize(self):
-		self.repository.create()
+		# self.repository.create()
+		pass
 	
 	@timed
 	def select_items(self, title, year, keywords, artist, language):

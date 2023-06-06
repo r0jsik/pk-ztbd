@@ -62,9 +62,10 @@ class CreateForm:
 		genre = self.genre_entry.get()
 		year = self.year_entry.get()
 		language = self.language_entry.get()
-		keywords = self.lyrics_entry.get("1.0", tk.END)
+		views = self.views_entry.get()
+		lyrics = self.lyrics_entry.get("1.0", tk.END)
 		
-		self.insert_record_callback(title, artist, genre, year, language, keywords)
+		self.insert_record_callback(title, artist, genre, year, language, views, lyrics)
 
 
 class SearchForm:
@@ -98,10 +99,11 @@ class SearchForm:
 		search_button.grid(row=5, column=1, sticky=tk.E)
 		
 		self.treeview.grid(row=6, column=0, columnspan=2)
-		self.treeview["columns"] = ("title", "popularity")
+		self.treeview["columns"] = ("artist", "title", "views")
 		self.treeview["show"] = "headings"
+		self.treeview.heading("artist", text="Wykonawca")
 		self.treeview.heading("title", text="Tytuł")
-		self.treeview.heading("popularity", text="Popularność")
+		self.treeview.heading("views", text="Wyświetlenia")
 	
 	def update_records(self):
 		title = self.title_entry.get()
@@ -109,11 +111,11 @@ class SearchForm:
 		keywords = self.keywords_entry.get()
 		artist = self.artist_entry.get()
 		language = self.language_entry.get()
-		records = self.search_records_callback(title, year, keywords, artist, language)
+		records = self.search_records_callback(title, int(year), keywords, artist, language)
 		
 		for row in self.treeview.get_children():
 			self.treeview.delete(row)
 		
 		for record in records:
-			record = record["title"], record["popularity"]
+			record = record["artist"]["name"], record["title"], record["views"]
 			self.treeview.insert("", "end", values=record)

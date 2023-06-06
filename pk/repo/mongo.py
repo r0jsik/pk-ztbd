@@ -29,10 +29,12 @@ class MongoRepository(Repository):
     
     def select_all(self, **criteria):
         query = {}
-        
+
         for parameter, value in criteria.items():
             if value:
-                query[parameter] = value
+                if isinstance(value, str):
+                    query[parameter] = {"$eq": value}
+                elif isinstance(value, int):
+                    query[parameter] = {"$eq": int(value)}
         
-        for result in self.__collection.find(query):
-            yield result
+        return list(self.__collection.find(query))
