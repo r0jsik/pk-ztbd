@@ -37,7 +37,7 @@ class Graph:
 		pdf = norm.pdf(x, mean, std_dev)
 
 		self.plot.cla()
-		self.plot.plot(x, pdf, label='Rozkład Gaussa')
+		self.plot.plot(x, pdf, label='Rozkład')
 		self.plot.hist(data, bins=10, density=True, alpha=0.5, label='Popularność')
 		self.plot.set_xlabel('Popularność')
 		self.plot.set_ylabel('Wystąpienia')
