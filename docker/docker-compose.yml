@@ -20,12 +20,9 @@ services:
       context: elasticsearch
     environment:
       discovery.type: single-node
-      ELASTICSEARCH_TLS_ENABLED: false
       ELASTIC_PASSWORD: es
     ports:
       - "9200:9200"
-    volumes:
-      - elasticsearch-data:/usr/share/elasticsearch/data
 
   postgres:
     container_name: psql
@@ -57,12 +54,6 @@ volumes:
       type: "none"
       o: "bind"
       device: "/mnt/d/Projekty/pk-ztbd-data/mongodb"
-  elasticsearch-data:
-    driver: local
-    driver_opts:
-      type: "none"
-      o: "bind"
-      device: "/mnt/d/Projekty/pk-ztbd-data/elasticsearch"
   postgres-data:
     driver: local
     driver_opts:

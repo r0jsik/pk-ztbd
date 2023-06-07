@@ -111,7 +111,7 @@ class SearchForm:
 		keywords = self.keywords_entry.get()
 		artist = self.artist_entry.get()
 		language = self.language_entry.get()
-		records = self.search_records_callback(title, int(year), keywords, artist, language)
+		records = self.search_records_callback(title, int(year) if year else "", keywords, artist, language)
 		
 		for row in self.treeview.get_children():
 			self.treeview.delete(row)

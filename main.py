@@ -45,8 +45,8 @@ class Controller:
 					"id": 0,
 					"name": artist
 				},
-				"year": int(year),
-				"views": int(views),
+				"year": int(year) if year else 0,
+				"views": int(views) if views else 0,
 				"lyrics": lyrics,
 				"lang_cld3": "",
 				"lang_ft": "",

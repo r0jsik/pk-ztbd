@@ -6,7 +6,7 @@ from pk.repo.repository import Repository
 class ElasticsearchRepository(Repository):
     def __init__(self):
         self.__connection = Elasticsearch(
-            hosts="http://localhost:9200",
+            hosts="https://localhost:9200",
             http_auth=("elastic", "es"),
             verify_certs=False,
             request_timeout=60000
@@ -76,4 +76,9 @@ class ElasticsearchRepository(Repository):
         
         search_results = self.__connection.search(index="index", body=query)
         
-        return list(search_results["hits"]["hits"]["_source"])
+        data = []
+        
+        for row in search_results["hits"]["hits"]:
+            data.append(row["_source"])
+        
+        return data
